@@ -1,0 +1,3 @@
+FireAttack by jph98
+Based on a tut from learn game programming with Ruby
+by Mark Sobkowicz
