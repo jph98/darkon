@@ -5,6 +5,7 @@ require "yaml"
 
 require_relative "player"
 require_relative "enemy"
+require_relative "enemymobile"
 require_relative "asteroid"
 require_relative "bullet"
 require_relative "bonusitem"
@@ -16,6 +17,8 @@ require_relative "scenemanager"
 require_relative "gamecontext"
 
 require_relative "levelintro"
+require_relative "baseattacklevel"
+require_relative "asteroidnavigatelevel"
 
 #
 # Website: https://www.libgosu.org/
@@ -23,7 +26,7 @@ require_relative "levelintro"
 # Gosu Class: https://www.libgosu.org/rdoc/Gosu.html
 # Color: https://www.libgosu.org/rdoc/Gosu/Color.html
 #
-class FireAttack < Gosu::Window 
+class Darkon < Gosu::Window 
 
 	WIDTH = 800
 	HEIGHT = 600
@@ -91,13 +94,16 @@ class FireAttack < Gosu::Window
 		msg = "Protect your base, you cannot allow more than #{max_threshold} enemy ships past"
 		@scenemanager.scenelist << LevelIntro.new(self, @gamecontext, name, msg)
 
-		@scenemanager.scenelist << LevelOne.new(@gamecontext)
+		# TODO: Rename and move this to BaseAttack.rb
+		@scenemanager.scenelist << BaseAttackLevel.new(@gamecontext)
 		
 		name = "Level 2 - Asteroid Field"
 		msg = "Your cannon has been disabled by the asteroid field radiation"	
+
 		@scenemanager.scenelist << LevelIntro.new(self, @gamecontext, name, msg)
 
-		@scenemanager.scenelist << LevelTwo.new(@gamecontext)
+		# TODO: Rename and move this to AsteroidNavigate.rb
+		@scenemanager.scenelist << AsteroidNavigateLevel.new(@gamecontext)
 		@scenemanager.first()
 	end
 
@@ -328,5 +334,5 @@ class FireAttack < Gosu::Window
 
 end
 
-window = FireAttack.new
+window = Darkon.new
 window.show

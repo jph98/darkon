@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-require_relative "levelone"
-require_relative "leveltwo"
-
 class SceneManager
 
 	attr_accessor :current, :scenelist

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-class LevelOne
+class BaseAttackLevel
 
 	attr_accessor :destroyed, :name
 
@@ -80,9 +80,9 @@ class LevelOne
 
 			rand_speed = rand()
 			if rand_speed < @speed_ratio	
-				@enemies << Enemy.new(@gamecontext, @slow_speed)
+				@enemies << EnemyMobile.new(@gamecontext, @slow_speed)
 			else
-				@enemies << Enemy.new(@gamecontext, @fast_speed)
+				@enemies << EnemyMobile.new(@gamecontext, @fast_speed)
 			end
 
 			@appeared += 1

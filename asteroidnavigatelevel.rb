@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-class LevelTwo
+class AsteroidNavigateLevel
 
 	attr_accessor :name
 
