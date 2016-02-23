@@ -17,7 +17,6 @@ class Explosion
 
 	def draw
 
-		#@image.draw(@x - @radius, @y - @radius, 1)
 		if @image_num < @images.size()
 			@images[@image_num].draw(@x - @radius, @y - @radius, 2)
 			@image_num += 1

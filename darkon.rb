@@ -7,12 +7,15 @@ require_relative "player"
 require_relative "enemy"
 require_relative "asteroid"
 require_relative "bullet"
+require_relative "bonusitem"
 require_relative "explosion"
 require_relative "scoreboard"
 require_relative "highscorelist"
 require_relative "credit"
 require_relative "scenemanager"
 require_relative "gamecontext"
+
+require_relative "levelintro"
 
 #
 # Website: https://www.libgosu.org/
@@ -31,11 +34,9 @@ class FireAttack < Gosu::Window
 
 		@config = YAML.load_file("config.yml")
 		super(WIDTH, HEIGHT, fullscreen = @config["fullscreen"])
-		self.caption = "Fire Attack"
+		self.caption = "Darkon"
 		
-		@max_enemies_before_game_end = @config["game"]["max_enemies_before_game_end"]
-
-		@background_image = Gosu::Image.new("images/start_screen.png")
+		@start_bg_image = Gosu::Image.new("images/start_screen.png")
 		@scene = :start
 
 		@scoreboard = ScoreBoard.new()
@@ -54,15 +55,22 @@ class FireAttack < Gosu::Window
 		end
 
 		# Load the sound effects
-		sounds = {}
-		sounds["explosion"] = Gosu::Sample.new('sounds/explosion.wav')
-		sounds["shoot"] = Gosu::Sample.new('sounds/shoot.ogg')
-		sounds["levelonemsuic"] = Gosu::Song.new('sounds/krkk.ogg')
-
-		sounds["levelonemsuic"].play(true)
+		@sounds = {}
+		@sounds["explosion"] = Gosu::Sample.new('sounds/explosion.wav')
+		@sounds["bonusitemcollected"] = Gosu::Sample.new('sounds/bonusitemcollected.wav')
+		@sounds["shoot"] = Gosu::Sample.new('sounds/shoot.ogg')
+		@sounds["levelonemusic"] = Gosu::Song.new('sounds/krkk.ogg')
+		@sounds["levelonemusic"].play(true)
  
 		# Move to player/gamecontext
 		@name = "jon"			
+
+		@colors = {}
+		@colors["orange"] = 0xffff9933
+		@colors["white"] = 0xffffffff
+		@colors["gray"] = 0xff808080
+		@colors["red"] = 0xff_ff0000
+		@colors["yellow"] = 0xff_ffff00
 
 		# Move @config to gamecontext
 		
@@ -73,11 +81,22 @@ class FireAttack < Gosu::Window
 
 		# Init player with specifics, need to pass to gamecontext for everything else
 		@player = Player.new(@name, @config, @window_attributes)
-		@gamecontext = GameContext.new(@player, @window_attributes, @config, sounds)
+		@gamecontext = GameContext.new(@player, @window_attributes, @config, @sounds, @scoreboard, @colors)
 		
 		# Setup levels
-		@scenemanager = SceneManager.new()		
+		@scenemanager = SceneManager.new()	
+
+		name = "Level 1 - Defend your Base"
+		max_threshold = @gamecontext.config["levelone"]["max_num_ships_that_can_escape"]
+		msg = "Protect your base, you cannot allow more than #{max_threshold} enemy ships past"
+		@scenemanager.scenelist << LevelIntro.new(self, @gamecontext, name, msg)
+
 		@scenemanager.scenelist << LevelOne.new(@gamecontext)
+		
+		name = "Level 2 - Asteroid Field"
+		msg = "Your cannon has been disabled by the asteroid field radiation"	
+		@scenemanager.scenelist << LevelIntro.new(self, @gamecontext, name, msg)
+
 		@scenemanager.scenelist << LevelTwo.new(@gamecontext)
 		@scenemanager.first()
 	end
@@ -129,9 +148,7 @@ class FireAttack < Gosu::Window
 
 				action, message = @scene.update()
 
-				if action.eql? :point_scored
-					@scoreboard.points += 10
-				elsif action.eql? :level_failed
+				if action.eql? :level_failed
 					initialize_end(:level_failed, message)
 				end
 		end
@@ -140,15 +157,15 @@ class FireAttack < Gosu::Window
 
 	def draw_start_screen
 
-		@background_image.draw(0,0,0)
+		@start_bg_image.draw(0,0,0)
 
 		# colors, see - http://www.nthelp.com/colorcodes.htm
 
-		title_msg = "Fire Attack" # orange
-		draw_center(title_msg, 55, 0xffff9933, CENTER, 90) 
+		title_msg = "Darkon"
+		draw_center(title_msg, 55, @colors["orange"], CENTER, 90) 
 
-		strap_msg = "Mission control defence edition" # white
-		draw_center(strap_msg, 22, 0xff808080, CENTER, 130) 
+		strap_msg = "Mission control defence edition"
+		draw_center(strap_msg, 22, @colors["gray"], CENTER, 130) 
 
 		enemy = Gosu::Image.new("images/enemy.png")
 		start_x = (WIDTH / 4)
@@ -157,18 +174,18 @@ class FireAttack < Gosu::Window
 		end
 
 		obj_msg = "Objective: Destroy as many enemies before 100 of them reach the base"
-		draw_center(obj_msg, 20, 0xffffffff, CENTER, 300) # white
+		draw_center(obj_msg, 20, @colors["white"], CENTER, 300) 
 
-		ctl_msg = "Arrow keys to move, space to fire" # yellow
-		draw_center(ctl_msg, 20, 0xffffffff, CENTER, 340) 
+		ctl_msg = "Arrow keys to move, space to fire" 
+		draw_center(ctl_msg, 20, @colors["white"], CENTER, 340) 
 
 		@player.reset(CENTER)
 		@player.draw
 		
-		draw_center("Name: " + @player.name, 20, 0xffffff00, CENTER, 430) 
+		draw_center("Commander Name: " + @player.name, 20, @colors["orange"], CENTER, 430) 
 
 		name_msg = "Hit the enter key to start"
-		draw_center(name_msg, 16, 0xffffffff, CENTER, 460) 
+		draw_center(name_msg, 16, @colors["white"], CENTER, 460) 
 	end
 
 	def draw_center(text, font_size, color, x_pos, y_pos) 
@@ -211,20 +228,22 @@ class FireAttack < Gosu::Window
 
 		elsif id.eql? Gosu::KbDelete or id.eql? Gosu::KbBackspace
 			@player.name = @player.name.chop
-		elsif id >= 4 and id <= 29 or id.eql? Gosu::KbSpace
-			@player.name += button_id_to_char(id)
+		elsif (id >= 4 and id <= 29) or id.eql? Gosu::KbSpace
+			if @player.name.length < 10
+				@player.name += button_id_to_char(id)
+			end
 		end
 	end
 
 	def draw_score() 
 
 		score_msg_y = 40
-		@score_font.draw("Score: #{@scoreboard.points}", x = 40, y = score_msg_y, 1, 1, 1, Gosu::Color.new(0xff_ffff00))
+		@score_font.draw("Score: #{@scoreboard.points}", x = 40, y = score_msg_y, 1, 1, 1, Gosu::Color.new(@colors["yellow"]))
 
 		msgs = @scene.objective_score_msgs()
 		msgs.each do |m|
 			score_msg_y += 40
-			@score_font.draw(m, x = 40, y = score_msg_y, 1, 1, 1, Gosu::Color.new(0xff_ff0000))
+			@score_font.draw(m, x = 40, y = score_msg_y, 1, 1, 1, Gosu::Color.new(@colors["red"]))
 		end
 	end
 
@@ -269,20 +288,16 @@ class FireAttack < Gosu::Window
 		end
 
 		# Draw a divider
-		red = Gosu::Color.new(0xff_ff0000)
-		draw_line(0, 140, red, WIDTH, 140, red)
+		draw_line(0, 140, Gosu::Color.new(@colors["orange"]), WIDTH, 140, Gosu::Color.new(@colors["orange"]))
 
-		# Draw both messages on the screen
-		yellow = Gosu::Color.new(0xff_ffff00)
-		@message_font.draw(@message, 40, 40, 1, 1, 1, yellow)
-	  	@message_font.draw(@message2, 40, 75, 1, 1, 1, yellow)
+		draw_center(@message, 50, @colors["orange"], CENTER, 90) 
+		draw_center(@message2, 40, @colors["orange"], CENTER, 160) 
 
 	  	# Draw a divider	  	
-	  	draw_line(0, 500, red, WIDTH, 500, red)
+	  	draw_line(0, 500, Gosu::Color.new(@colors["orange"]), WIDTH, 500, Gosu::Color.new(@colors["orange"]))
 
 	  	# Draw the bottom message (for play or quit)
-	  	green = Gosu::Color.new(0xff_00ff00)
-	  	@message_font.draw(@bottom_message, 180, 540, 1, 1, 1, green)
+	  	draw_center(@bottom_message, 40, @colors["orange"], CENTER, 540) 
 
 	end
 
@@ -305,7 +320,6 @@ class FireAttack < Gosu::Window
 			@scene = :start
 			@scenemanager.reset()
 			@scenemanager.first()			
-			puts "Set #{@scenemanager.current.name}"
 		elsif id == Gosu::KbQ
 			# Quit
 			close

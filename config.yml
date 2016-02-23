@@ -16,9 +16,11 @@ levelone:
   enemy_slow_speed: 2
   enemy_fast_speed: 4
   speed_ratio: 0.5
+  bonus_item_frequency: 0.005
+  bonus_item_type_frequency: 0.05
 
 leveltwo:
-  num_asteroids_pass_to_complete: 1
+  num_asteroids_pass_to_complete: 5
   asteroid_frequency: 0.05  
   asteroid_slow_speed: 2
   asteroid_fast_speed: 4

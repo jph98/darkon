@@ -2,7 +2,7 @@
 
 class Player
 
-	attr_accessor :x, :y, :angle, :radius, :name
+	attr_accessor :x, :y, :angle, :radius, :name, :acceleration, :rotation_speed
 
 	def initialize(name, config, windowattributes)
 

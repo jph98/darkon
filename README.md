@@ -11,8 +11,6 @@ Vary movement:
 * Types of enemies in terms of how they move
 * Enemies that fire as well as move
 
-5. Introduce a power up that changes fire rate, speed of ship
-
 6. Add a boss scene (big enemy that fires lots of shots in patterns)
 
 7. Introduce an energy bar for the base

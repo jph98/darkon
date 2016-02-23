@@ -21,8 +21,6 @@ class LevelTwo
 		reset()
 
 		@name = "Level 2 - Asteroid Field"
-
-		@flash_msg = "Your cannon has been disabled by the asteroid field radiation"
 	end
 
 	def reset()
@@ -37,8 +35,6 @@ class LevelTwo
 	end
 
 	def draw
-
-		# Flash message for level objective
 
 		@player.draw
 
@@ -104,12 +100,12 @@ class LevelTwo
 			distance = Gosu::distance(e.x, e.y, @player.x, @player.y)
 			if distance < @player.radius + e.radius
 				@gamecontext.sounds["explosion"].play()
-				return :level_failed, "You were hit by an asteroid and exploded"
+				return :level_failed, "You were hit by an asteroid!"
 			end
 		end
 
 		if @player.y < -@player.radius
-			return :level_failed, "You strayed outside base and got destroyed by the mothership!"
+			return :level_failed, "You left your base and were destroyed!"
 		end
 
 		return :no_action_to_take

@@ -7,22 +7,28 @@ class LevelOne
 	def initialize(gamecontext)
 
 		@enemies = []
+		@bonus_items = []
 		@bullets = []
 		@explosions = []
 		@gamecontext = gamecontext
 
 		@player = @gamecontext.player
 
-		@max_threshold = max_threshold = @gamecontext.config["levelone"]["max_num_ships_that_can_escape"]
+		@max_threshold = @gamecontext.config["levelone"]["max_num_ships_that_can_escape"]
 		@enemy_frequency = @gamecontext.config["levelone"]["enemy_frequency"]
+		@bonus_item_frequency = @gamecontext.config["levelone"]["bonus_item_frequency"]
 		@slow_speed = @gamecontext.config["levelone"]["enemy_slow_speed"]
 		@fast_speed = @gamecontext.config["levelone"]["enemy_slow_speed"]
 		@speed_ratio = @gamecontext.config["levelone"]["speed_ratio"]
 
 		reset()
 
+		@bg_image = Gosu::Image.new("images/bg_game_image.png")
+
 		@name = "Level 1 - Attack Ships"
-		@flash_msg = "Protect your base, you cannot allow more than #{@max_threshold} enemy ships past"
+		
+		@bg_x = 0
+		@bg_y = 0
 	end
 
 	def reset()
@@ -35,11 +41,12 @@ class LevelOne
 		@enemies.clear()
 		@bullets.clear()
 		@explosions.clear()
+		@bonus_items.clear()
 	end
 
 	def draw
 
-		# Flash message for level objective
+		@bg_image.draw(@bg_x, @bg_y, 0)
 
 		@player.draw
 
@@ -51,6 +58,10 @@ class LevelOne
 			b.draw
 		end
 
+		@bonus_items.each do |bi|
+			bi.draw
+		end
+
 		@explosions.each do |e|
 			e.draw
 		end
@@ -60,10 +71,12 @@ class LevelOne
 
 	def update()
 
-		rand_num = rand()
+		@bg_y += 1
+
+		rand_enemy_num = rand()
 
 		# Determine how many enemies to produce
-		if rand_num < @enemy_frequency			
+		if rand_enemy_num < @enemy_frequency			
 
 			rand_speed = rand()
 			if rand_speed < @speed_ratio	
@@ -75,6 +88,11 @@ class LevelOne
 			@appeared += 1
 		end
 
+		rand_bonus_item_num = rand()
+		if rand_bonus_item_num < @bonus_item_frequency
+			@bonus_items << BonusItem.new(@gamecontext, @fast_speed)
+		end
+
 		@enemies.each do |e|
 			e.move
 
@@ -83,6 +101,10 @@ class LevelOne
 				@escaped += 1
 				e.respawn()
 			end
+		end
+
+		@bonus_items.each do |b|
+			b.move
 		end
 
 		@bullets.each do |b|
@@ -118,7 +140,8 @@ class LevelOne
 					@explosions << Explosion.new(@gamecontext, e.x, e.y)
 					@gamecontext.sounds["explosion"].play()
 					@destroyed += 1
-					return :point_scored, "Destroyed ship"
+
+					@gamecontext.scoreboard.points += 10
 				end
 			end
 		end
@@ -141,7 +164,7 @@ class LevelOne
 		end
 		
 		if @escaped > @max_threshold	
-			return :level_failed, "#{max} enemy ships escaped, your base was destroyed" 
+			return :level_failed, "#{@max_threshold} ships escaped, base destroyed!" 
 		end
 
 		# Collision detection for player
@@ -154,8 +177,24 @@ class LevelOne
 			end
 		end
 
+		@bonus_items.dup().each do |bi|
+			distance = Gosu::distance(bi.x, bi.y, @player.x, @player.y)
+			if distance < @player.radius + bi.radius
+
+				@gamecontext.sounds["bonusitemcollected"].play()				
+				@bonus_items.delete bi
+
+				if bi.type.eql? BonusItem::LOOT
+					@gamecontext.scoreboard.points += 25
+				elsif bi.type.eql? BonusItem::SPEEDUP
+					@gamecontext.player.acceleration = 0.7
+					@gamecontext.player.rotation_speed = 5
+				end
+			end						
+		end
+
 		if @player.y < -@player.radius
-			return :level_failed, "You strayed outside base and got destroyed by the mothership!"
+			return :level_failed, "You left your base and were destroyed!"
 		end
 
 		return :no_action_to_take
