@@ -8,7 +8,6 @@ class EnemyMobile
 
 	def initialize(gamecontext, speed)
 
-		# Randomize placement
 		@radius = 20
 		@width = gamecontext.window_attributes["width"]
 		@height = gamecontext.window_attributes["height"]

@@ -21,6 +21,10 @@ class AsteroidNavigateLevel
 		reset()
 
 		@name = "Level 2 - Asteroid Field"
+
+		@bg = Gosu::Image.new("images/bg_game_image.png")
+		@bg_x = 0
+		@bg_y = 0
 	end
 
 	def reset()
@@ -35,6 +39,13 @@ class AsteroidNavigateLevel
 	end
 
 	def draw
+
+		height = @gamecontext.window_attributes["height"]
+		@local_y = @bg_y % -height
+	    @bg.draw(0, @local_y, 0)
+	    if @local_y < 0
+	      @bg.draw(0, @local_y + height, 0) 
+	    end
 
 		@player.draw
 
@@ -55,10 +66,10 @@ class AsteroidNavigateLevel
 
 	def update
 		
+		@bg_y += 8
 		rand_num = rand()
 		
 		# Determine how many asteroids to produce
-		
 		if rand_num < @asteroid_frequency
 
 			rand_speed = rand()
@@ -113,7 +124,6 @@ class AsteroidNavigateLevel
 
 	def complete() 
 
-		# Change to num destroyed
 		complete_threshold = @gamecontext.config["leveltwo"]["num_asteroids_pass_to_complete"]
 		complete = @number_asteroids_passed.eql? complete_threshold
 		return complete

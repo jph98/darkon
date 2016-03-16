@@ -23,12 +23,15 @@ class BaseAttackLevel
 
 		reset()
 
-		@bg_image = Gosu::Image.new("images/bg_game_image.png")
-
 		@name = "Level 1 - Attack Ships"
-		
-		@bg_x = 0
-		@bg_y = 0
+
+		@bg_static = Gosu::Image.new("images/bg_image.png")
+
+		#@bg = Gosu::Image.new("images/bg_game_image.png")
+		#@bg_y = 0
+
+		# @bg_overlay = Gosu::Image.new("images/bg_overlay.png")
+		# @bg_overlay_y = 0
 	end
 
 	def reset()
@@ -46,7 +49,21 @@ class BaseAttackLevel
 
 	def draw
 
-		@bg_image.draw(@bg_x, @bg_y, 0)
+		height = @gamecontext.window_attributes["height"]
+		@bg_static.draw(0, 0, 0)
+
+		# Background render		
+		# @local_y = @bg_y % -height
+	 #    @bg.draw(0, @local_y, 0)
+	 #    if @local_y < 0
+	 #      @bg.draw(0, @local_y + height, 0) 
+	 #    end
+
+	    # @local_over_y = @bg_overlay_y % -height
+	    # @bg_overlay.draw(0, @local_over_y, 0)
+	    # if @local_over_y < 0
+	    #   @bg_overlay.draw(0, @local_over_y + height, 0) 
+	    # end
 
 		@player.draw
 
@@ -71,7 +88,8 @@ class BaseAttackLevel
 
 	def update()
 
-		@bg_y += 1
+		# @bg_y += 3
+		# @bg_overlay_y += 1
 
 		rand_enemy_num = rand()
 

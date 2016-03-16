@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-class Enemy
+class EnemyFire
 
 	DEBUG = false
 	
@@ -20,6 +20,8 @@ class Enemy
 		@image = Gosu::Image.new("images/enemy.png")
 		@angle = 360
 
+		@current_direction = :down
+		@travelled = 0
 		puts "Placed enemy at: #{@x}, #{@y}" if DEBUG
 	end
 
@@ -28,7 +30,7 @@ class Enemy
 	end
 
 	def move
-		@y += @speed		
+		
 	end
 
 	def escaped?

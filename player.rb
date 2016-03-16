@@ -6,8 +6,8 @@ class Player
 
 	def initialize(name, config, windowattributes)
 
-		@x = 200
-		@y = 200
+		@x = config["player"]["start_pos_x"]
+		@y = config["player"]["start_pos_x"]
 		@angle = 0 # degrees
 		@image = Gosu::Image.new("images/ship.png")
 		@v_x = 0 # velocity
@@ -24,6 +24,12 @@ class Player
 
 		@v_x += Gosu.offset_x(@angle, @acceleration)
 		@v_y += Gosu.offset_y(@angle, @acceleration)
+	end
+
+	def backwards
+
+		@v_x -= Gosu.offset_x(@angle, @acceleration)
+		@v_y -= Gosu.offset_y(@angle, @acceleration)
 	end
 
 	def move

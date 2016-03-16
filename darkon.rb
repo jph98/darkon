@@ -25,6 +25,7 @@ require_relative "asteroidnavigatelevel"
 # Docs: https://www.libgosu.org/rdoc/
 # Gosu Class: https://www.libgosu.org/rdoc/Gosu.html
 # Color: https://www.libgosu.org/rdoc/Gosu/Color.html
+# colors, see - http://www.nthelp.com/colorcodes.htm
 #
 class Darkon < Gosu::Window 
 
@@ -39,7 +40,9 @@ class Darkon < Gosu::Window
 		super(WIDTH, HEIGHT, fullscreen = @config["fullscreen"])
 		self.caption = "Darkon"
 		
-		@start_bg_image = Gosu::Image.new("images/start_screen.png")
+		@logo = Gosu::Image.new("images/darkonlogo.png")
+
+		@start_bg_image = Gosu::Image.new("images/title_screen.png")
 		@scene = :start
 
 		@scoreboard = ScoreBoard.new()
@@ -78,15 +81,14 @@ class Darkon < Gosu::Window
 		# Move @config to gamecontext
 		
 		@window_attributes = {}
-		@window_attributes["width"] = WIDTH
-		@window_attributes["height"] = HEIGHT
-		@window_attributes["center"] = CENTER
+		@window_attributes["width"] = @config["width"]
+		@window_attributes["height"] = @config["height"]
+		@window_attributes["center"] = @config["width"] / 2
 
 		# Init player with specifics, need to pass to gamecontext for everything else
 		@player = Player.new(@name, @config, @window_attributes)
 		@gamecontext = GameContext.new(@player, @window_attributes, @config, @sounds, @scoreboard, @colors)
 		
-		# Setup levels
 		@scenemanager = SceneManager.new()	
 
 		name = "Level 1 - Defend your Base"
@@ -94,7 +96,6 @@ class Darkon < Gosu::Window
 		msg = "Protect your base, you cannot allow more than #{max_threshold} enemy ships past"
 		@scenemanager.scenelist << LevelIntro.new(self, @gamecontext, name, msg)
 
-		# TODO: Rename and move this to BaseAttack.rb
 		@scenemanager.scenelist << BaseAttackLevel.new(@gamecontext)
 		
 		name = "Level 2 - Asteroid Field"
@@ -102,7 +103,6 @@ class Darkon < Gosu::Window
 
 		@scenemanager.scenelist << LevelIntro.new(self, @gamecontext, name, msg)
 
-		# TODO: Rename and move this to AsteroidNavigate.rb
 		@scenemanager.scenelist << AsteroidNavigateLevel.new(@gamecontext)
 		@scenemanager.first()
 	end
@@ -165,18 +165,17 @@ class Darkon < Gosu::Window
 
 		@start_bg_image.draw(0,0,0)
 
-		# colors, see - http://www.nthelp.com/colorcodes.htm
+		#title_msg = "Darkon"
+		#draw_center(title_msg, 55, @colors["orange"], CENTER, 90) 
 
-		title_msg = "Darkon"
-		draw_center(title_msg, 55, @colors["orange"], CENTER, 90) 
+		@logo.draw_rot(x = (WIDTH / 2), 100, z = 0, angle = 0)
 
-		strap_msg = "Mission control defence edition"
-		draw_center(strap_msg, 22, @colors["gray"], CENTER, 130) 
+		#strap_msg = "Mission control defence edition"
+		#draw_center(strap_msg, 22, @colors["gray"], CENTER, 130) 
 
-		enemy = Gosu::Image.new("images/enemy.png")
-		start_x = (WIDTH / 4)
+		enemy = Gosu::Image.new("images/enemy.png")		
 		9.times do |i|
-			enemy.draw_rot(x = start_x + (i * 50), y = 235, z = 0, angle = 0)
+			enemy.draw_rot(x = (WIDTH / 4) + (i * 50), y = 235, z = 0, angle = 0)
 		end
 
 		obj_msg = "Objective: Destroy as many enemies before 100 of them reach the base"
@@ -212,7 +211,6 @@ class Darkon < Gosu::Window
 	# Gosu @override
 	def button_down(id)
 
-		# TODO: Put in level screens
 		case @scene
 
 		when :start

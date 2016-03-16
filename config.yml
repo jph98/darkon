@@ -1,16 +1,20 @@
 ---
 fullscreen: false
+width: 800
+height: 600
 
 player:
   acceleration: 0.3
   friction: 0.9
   rotation_speed: 2
+  start_pos_x: 400
+  start_pos_y: 400
 
 game:
   max_enemies_before_game_end: 40
 
 levelone:
-  ships_destroyed_to_complete: 1
+  ships_destroyed_to_complete: 10
   max_num_ships_that_can_escape: 40
   enemy_frequency: 0.05
   enemy_slow_speed: 2
@@ -20,7 +24,7 @@ levelone:
   bonus_item_type_frequency: 0.05
 
 leveltwo:
-  num_asteroids_pass_to_complete: 5
+  num_asteroids_pass_to_complete: 20
   asteroid_frequency: 0.05  
   asteroid_slow_speed: 2
   asteroid_fast_speed: 4

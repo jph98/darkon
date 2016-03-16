@@ -1,19 +1,21 @@
 #!/usr/bin/env ruby
 
-class Enemy
+class EnemySpixon
 
 	DEBUG = false
 	
-	attr_reader :x, :y, :radius
+	attr_reader :x, :y, :radius, :name
 
-	def initialize(gamecontext, speed)
+	def initialize(gamecontext, speed, x, y)
 
+		@name = "Spixon"
+		
 		@radius = 20
 		@width = gamecontext.window_attributes["width"]
 		@height = gamecontext.window_attributes["height"]
 
-		@x = rand(@width - 2 * @radius ) + @radius
-		@y = 0
+		@x = x
+		@y = y
 
 		# Get from the config (or is this contextual within the level?)
 		@speed = speed
@@ -35,8 +37,7 @@ class Enemy
 		return @y > @height + @radius
 	end
 
-	def respawn
-		@x = rand(@width - 2 * @radius) + @radius
+	def respawn		
 		@y = 0
 	end
 end
