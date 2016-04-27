@@ -71,7 +71,7 @@ class Sandbox < Gosu::Window
 		# end
 
 		# Pattern
-		# TODO: Move this to a EnemyDestroyer.rb class
+		#TODO: Move this to a EnemyDestroyer.rb class
 		# 5.times do
 		#  	x = rand(0...@config["width"])
 		#  	y = rand(0...@config["height"])
@@ -79,14 +79,14 @@ class Sandbox < Gosu::Window
 		#  	#@enemies << EnemyCannon.new(@gamecontext, 2, 500, 500)
 		# end
 
-		# Pattern
-		# TODO: Move the movement out into an algorithm
-		# TODO: Find a way to move the enemy between a list of coordinates
-		@enemies << EnemyArc.new(@gamecontext, 2, 150, 50, [150, 400])
-
 		# Pattern:
 		# Moves in a downwards then orbits then returns
-		#@enemies << EnemyCircular.new(@gamecontext, 3, 400, 50)
+		@enemies << EnemyCircular.new(@gamecontext, 3, 400, 50)
+
+		# Pattern (TODO, current working on)
+		# TODO: Move the movement out into an algorithm
+		# TODO: Find a way to move the enemy between a list of coordinates
+		#@enemies << EnemyArc.new(@gamecontext, 2, 150, 50, [150, 400])
 	end
 
 	def draw
@@ -141,6 +141,8 @@ class Sandbox < Gosu::Window
 
 		if id == Gosu::KbSpace
 			@bullets << Bullet.new(@gamecontext, @player.x, @player.y, @player.angle)
+			@bullets << Bullet.new(@gamecontext, @player.x, @player.y, @player.angle - 45)
+			@bullets << Bullet.new(@gamecontext, @player.x, @player.y, @player.angle + 45)
 		end
 	end
 

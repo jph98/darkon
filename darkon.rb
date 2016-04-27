@@ -175,7 +175,7 @@ class Darkon < Gosu::Window
 
 		enemy = Gosu::Image.new("images/enemy.png")		
 		9.times do |i|
-			enemy.draw_rot(x = (WIDTH / 4) + (i * 50), y = 235, z = 0, angle = 0)
+			enemy.draw_rot(x = (WIDTH / 4) + (i * 50), y = 235, z = 0, angle = 180)
 		end
 
 		obj_msg = "Objective: Destroy as many enemies before 100 of them reach the base"

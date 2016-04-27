@@ -17,8 +17,8 @@ class LevelIntro
 		@bg = Gosu::Image.new("images/bg_game_image.png")
 		@bg_y = 0
 
-		@bg_layer = Gosu::Image.new("images/bg_overlay.png")
-		@bg_layer_y = 0
+		# @bg_layer = Gosu::Image.new("images/bg_overlay.png")
+		# @bg_layer_y = 0
 	end
 
 	def reset()
@@ -33,11 +33,11 @@ class LevelIntro
 	      @bg.draw(0, @local_y + @height, 0) 
 	    end
 
-	    @local_layer_y = @bg_layer_y % -@height
-	    @bg_layer.draw(0, @local_layer_y, 0)
-	    if @local_layer_y < 0
-	      @bg_layer.draw(0, @local_layer_y + @height, 0) 
-	    end
+	    # @local_layer_y = @bg_layer_y % -@height
+	    # @bg_layer.draw(0, @local_layer_y, 0)
+	    # if @local_layer_y < 0
+	    #   @bg_layer.draw(0, @local_layer_y + @height, 0) 
+	    # end
 
 		draw_center(@name, 50, @gamecontext.colors["orange"], @center, 250) 
 		draw_center(@msg, 20, @gamecontext.colors["white"], @center, 300) 		
@@ -56,7 +56,7 @@ class LevelIntro
 
 	def update()
 		@bg_y += 3
-		@bg_layer_y += 1
+		#@bg_layer_y += 1
 	end
 
 	def handle_button_down(id)

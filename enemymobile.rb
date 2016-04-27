@@ -18,7 +18,7 @@ class EnemyMobile
 		# Get from the config (or is this contextual within the level?)
 		@speed = speed
 		@image = Gosu::Image.new("images/enemy.png")
-		@angle = 360
+		@angle = 180
 
 		@current_direction = :down
 		@travelled = 0
@@ -26,7 +26,8 @@ class EnemyMobile
 	end
 
 	def draw
-		@image.draw(@x - @radius, @y - @radius, 1)
+		#@image.draw(@x - @radius, @y - @radius, 1)
+		@image.draw_rot(@x - @radius, @y - @radius, 1, @angle)
 	end
 
 	def move
